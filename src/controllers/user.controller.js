@@ -150,7 +150,6 @@ const loginUser = asyncHandler(async (req, res) => {
   const loggedInUser = await User.findById(user._id).select(
     "-password -refreshToken"
   );
-
   //6. send cookie
   const options = {
     httpOnly: true,
@@ -291,17 +290,14 @@ const updateAccountDetails = asyncHandler(async (req, res) => {
 
 const updateUserAvatar = asyncHandler(async (req, res) => {
   const avatarLocalPath = req.file?.path;
-
+  console.log("Avatar : ", avatarLocalPath);
   if (!avatarLocalPath) {
     throw new ApiError(400, "avatar file is missing");
   }
   // deleting old image
   const deleteOldAvatar = await User.findById(req.user?._id).select("avatar");
   const OldAvatarUrl = deleteOldAvatar.avatar;
-  const regex = OldAvatarUrl?.match(/\/([^\/]+)\.\w+$/);
-  const avatarPublic_id = regex ? regex[1] : null;
-  //console.log("public id:", avatarPublic_id);
-  const oldAvatarDeleted = await deleteOnCloudinary(avatarPublic_id);
+  const oldAvatarDeleted = await deleteOnCloudinary(OldAvatarUrl);
 
   if (!oldAvatarDeleted) {
     throw new ApiError(400, "old avatar not deleted");

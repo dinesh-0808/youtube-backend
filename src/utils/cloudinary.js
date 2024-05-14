@@ -27,9 +27,11 @@ const uploadOnCloudinary = async (localFilePath) => {
   }
 };
 
-const deleteOnCloudinary = async (public_id) => {
+const deleteOnCloudinary = async (cloudinaryUrl) => {
   try {
-    const result = await cloudinary.uploader.destroy(public_id);
+    const regex = cloudinaryUrl?.match(/\/([^\/]+)\.\w+$/);
+    const publicId = regex ? regex[1] : null;
+    const result = await cloudinary.uploader.destroy(publicId);
     return result;
   } catch (error) {
     throw new ApiError(402, error || "image not deleted");
